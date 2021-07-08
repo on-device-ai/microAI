@@ -14,7 +14,7 @@ Please follow the steps below to build the software of MicroAI for CAM-C1126S2U 
 `.repo/repo/repo sync -l`  
 `.repo/repo/repo sync -c --no-tag`  
 `.repo/repo/repo start firefly --all`  
-6. Follow the micoAI's [rv1126\_rv1109\_linux\_a\_camera](https://github.com/on-device-ai/microAI/blob/main/rv1126_rv1109_linux_ai_camera) modification, add and modify the source code files of CAM-C1126S2U  
+6. Follow the micoAI's [rv1126\_rv1109\_linux\_a\_camera](https://github.com/on-device-ai/microAI/blob/main/rv1126_rv1109_linux_ai_camera) modification content, add and modify the source code files of CAM-C1126S2U  
 7. Select the configuration file cam-crv1126s2u-uvcc.mk to configure :  
 `./build.sh cam-crv1126s2u-uvcc.mk`  
 8. Building the software :  
