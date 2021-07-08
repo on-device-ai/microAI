@@ -10,7 +10,7 @@ This project base on the "[CAM-C1126S2U smart dual-lens camera module](http://en
   
 Based on the manufacturer's [AI_UVC](https://wiki.t-firefly.com/en/CAM-C11262U/Application_scenarios.html#ai-uvc-camera) application, make the following modifications:  
 
-1. Software modification, change Dual Camera to Signal Camera  
+1. Software modification, the dual camera changed to the single camera 
 2. Add MicroPython and TensorFlow Lite for Microcontrollers software packages to Buildroot  
 3. Increase the bridge library from C++11 to C code to reduce the difficulty of integration  
 4. Through the ISP's multi-path mechanism, the UVC Camera function and the MicroPython application can obtain the same image source (Camera) at the same time  
