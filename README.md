@@ -15,4 +15,4 @@ Based on the manufacturer's [AI_UVC](https://wiki.t-firefly.com/en/CAM-C11262U/A
 3. Increase the bridge library from C++11 to C code to reduce the difficulty of integration  
 4. Through the ISP's multi-path mechanism, the UVC Camera function and the MicroPython application can obtain the same image source (Camera) at the same time  
   
-To know how to building microAI on CAM-C1126S2U, please refer to [HowToBuild.md](https://github.com/on-device-ai/microAI/blob/main/rv1126_rv1109_linux_ai_camera/HowToBuild.md) in the rv1126\_rv1109\_linux\_ai\_camera directory.
+To know how to build microAI on CAM-C1126S2U, please refer to [HowToBuild.md](https://github.com/on-device-ai/microAI/blob/main/rv1126_rv1109_linux_ai_camera/HowToBuild.md) in the rv1126\_rv1109\_linux\_ai\_camera directory.
