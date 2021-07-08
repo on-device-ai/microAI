@@ -1,0 +1,9 @@
+config BR2_PACKAGE_MICROAI
+	bool "microai"
+	depends on BR2_PACKAGE_TFLITE_MICRO
+	depends on BR2_PACKAGE_LIBV4L	
+	depends on BR2_PACKAGE_OPENCV3	
+	help
+	  microAI : The tflite-micro library and its wrapper functions
+
+	  https://on-device-ai.com/

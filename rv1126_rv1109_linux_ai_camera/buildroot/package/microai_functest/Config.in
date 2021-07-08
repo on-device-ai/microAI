@@ -1,0 +1,7 @@
+config BR2_PACKAGE_MICROAI_FUNCTEST
+	bool "microai_functest"
+	depends on BR2_PACKAGE_MICROAI
+	help
+	  The microAI library unit test program
+
+	  https://on-device-ai.com/
