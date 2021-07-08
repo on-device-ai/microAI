@@ -1,6 +1,6 @@
 # microAI
 This project is the early software development of our ODA-1000 product. Therefore, this project is conceptual, trying to integrate MicroPython and TensorFlow Lite for Microcontrollers on Embedded Linux for the initial development and teaching of TinyML technology.  
-Like all Embedded systems, Embedded Linux differs from Desktop or Server Linux in that it is a customized and restricted system. Although the two technologies integrated into this project are using for microcontrollers, it should be appropriate to apply them to embedded Linux in a "crossover" manner.  
+Like all Embedded systems, Embedded Linux differs from Desktop or Server Linux in that it is a customized and restricted system. Although the two technologies integrated into this project are using for microcontrollers, it should be appropriate to apply them to Embedded Linux in a "crossover" manner.  
 One factor is that the microcontroller is a more restricted system and will encounter many difficulties in the early development phase. The Embedded Linux system with more resources can be used as a product prototype and used for evaluation or demonstration.  
 This project base on the "[CAM-C1126S2U smart dual-lens camera module](http://en.t-firefly.com/product/dev/camc1126s2u.html)" for the following reasons:  
 
