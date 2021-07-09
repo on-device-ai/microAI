@@ -13,8 +13,6 @@ Then there is person_detection.py, which corresponds to the "person_detection" e
 `adb shell micropython /userdata/person_detection.py`  
 The video of the execution process is as follows:  
 ![person_detection](https://user-images.githubusercontent.com/44540872/125034312-0742e080-e0c3-11eb-92de-61bf714f06a6.gif)  
-Note: Since CAM-C1126S2U can have multiple paths with one camera, the above video will display the UVC Camera video and the inference result of the "person_detection" example at the same time.
-
-  
+Note: Since CAM-C1126S2U can have multiple paths with one camera, the above video will display both the UVC Camera image (captured by the AMCap application on Windows) and the inference result of the "person_detection" example.  
 
 
