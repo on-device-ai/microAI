@@ -8,7 +8,7 @@ Execute the script:
 `adb shell micropython /userdata/hello_world.py`  
 The video of the execution process is as follows:  
 ![hello_world](https://user-images.githubusercontent.com/44540872/125034515-3fe2ba00-e0c3-11eb-9252-95f62af19c92.gif)  
-Then execute person_detection.py, which corresponds to the "person_detection" example, and the execution process is the same as that of hello_world.py:  
+Then there is person_detection.py, which corresponds to the "person_detection" example, and the execution process is the same as that of hello_world.py:  
 `adb push person_detection.py /userdata`  
 `adb shell micropython /userdata/person_detection.py`  
 The video of the execution process is as follows:  
