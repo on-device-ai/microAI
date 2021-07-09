@@ -11,7 +11,7 @@ The video of the execution process is as follows:
 Then execute person_detection.py, which corresponds to the "person_detection" example, and the execution process is the same as that of hello_world.py:  
 `adb push person_detection.py /userdata`  
 `adb shell micropython /userdata/person_detection.py`  
-The video of the execution process is as follows:
+The video of the execution process is as follows:  
 ![person_detection](https://user-images.githubusercontent.com/44540872/125034312-0742e080-e0c3-11eb-92de-61bf714f06a6.gif)  
 Note: Since CAM-C1126S2U can have multiple paths with one camera, the above video will display the UVC Camera video and the inference result of the "person_detection" example at the same time.
 
