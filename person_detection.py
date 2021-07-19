@@ -1,5 +1,6 @@
 import tflite
 import microai
+import array
 import sys
 
 tflite.initialize_target();
@@ -10,14 +11,21 @@ tflite.build_interpreter()
 if tflite.allocate_tensors() is False :
   sys.exit()
   
+img_w    = 96
+img_h    = 96
+img_ch   = 1
+img_size = img_w * img_h * img_ch
+img_buff = array.array('b',[0] * img_size)
+  
 while True :
-  input_tensor = microai.get_image()
-  microai.set_input_tensor_int8(input_tensor)
+  microai.get_image(img_w,img_h,img_ch,img_buff)
+  microai.set_input_tensor_value(img_buff)
   if tflite.interpreter_invoke() is False :
     sys.exit()
-  output_tensor = microai.get_output_tensor_int8(2) 
-  person_score = microai.value_byte_to_int(output_tensor[1])
-  no_person_score = microai.value_byte_to_int(output_tensor[0])
+  output_tensor = array.array('b',[0,0])
+  microai.get_output_tensor_value(output_tensor) 
+  person_score = output_tensor[1]
+  no_person_score = output_tensor[0]
   if person_score > no_person_score :
     print("Person detected!")
   else:

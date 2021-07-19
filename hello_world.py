@@ -1,5 +1,6 @@
 import tflite
 import microai
+import array
 import sys
 
 inferences_per_cycle = 20;
@@ -18,12 +19,12 @@ inference_count = 0;
 while True :
   position = float(inference_count) / float(inferences_per_cycle)
   x = position * x_range
-  input_tensor = bytearray(1)
-  input_tensor[0] = microai.value_input_quantize(x)
-  microai.set_input_tensor_int8(input_tensor)
+  input_tensor = array.array('b',[microai.value_input_quantize(x)])
+  microai.set_input_tensor_value(input_tensor)
   if tflite.interpreter_invoke() is False :
     sys.exit()
-  output_tensor = microai.get_output_tensor_int8(1)
+  output_tensor = array.array('b',[0])
+  microai.get_output_tensor_value(output_tensor)
   y = microai.value_output_dequantize(output_tensor[0])
   inference_count += 1
    

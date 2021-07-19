@@ -18,6 +18,11 @@
 #include "py/obj.h"
 #include "py/runtime.h"
 
+// Use special typecode to differentiate repr() of bytearray vs array.array('B')
+// (underlyingly they're same).  Can't use 0 here because that's used to detect
+// type-specification errors due to end-of-string.
+#define BYTEARRAY_TYPECODE 1
+
 /***** Function *****/
 
 /* tflite */
@@ -92,39 +97,78 @@ STATIC mp_obj_t microai_load_person_detection_model() {
   
 }
 
-STATIC mp_obj_t microai_set_input_tensor_int8(mp_obj_t data) {
+STATIC mp_obj_t microai_set_input_tensor_value(mp_obj_t tensor) {
 
   microai_tensor   _input;
   mp_buffer_info_t _bufinfo;
   
   microai_get_input_tensor(&_input);  
 
+  if (mp_get_buffer(tensor, &_bufinfo, MP_BUFFER_READ)) {
 
-  if (mp_get_buffer(data, &_bufinfo, MP_BUFFER_WRITE)) {
+    switch(_bufinfo.typecode) {
+      
+      case BYTEARRAY_TYPECODE:
+      case 'B':
+          memcpy(_input.data.uint8,(uint8_t *)_bufinfo.buf,_bufinfo.len);
+          break;
 
-    memcpy(_input.data.int8,(int8_t *)_bufinfo.buf,_bufinfo.len);
+      case 'b':
+          memcpy(_input.data.int8,(int8_t *)_bufinfo.buf,_bufinfo.len);
+          break;
+
+      case 'f':
+          memcpy(_input.data.f,(float *)_bufinfo.buf,_bufinfo.len);
+          break;
+
+      default:
+          return mp_const_false;
+
+    }
 
     return mp_const_true;
 
   }
     
   return mp_const_false;
+
 } 
 
+STATIC mp_obj_t microai_get_output_tensor_value(mp_obj_t tensor) {
 
-
-STATIC mp_obj_t microai_get_output_tensor_int8(mp_obj_t len) {
-
-  microai_tensor _output;
-
-  size_t         _len;
-
-  _len = mp_obj_get_int(len);
+  microai_tensor   _output;
+  mp_buffer_info_t _bufinfo;
 
   microai_get_output_tensor(&_output);
 
-  return mp_obj_new_bytearray(_len, _output.data.int8);
-  
+  if (mp_get_buffer(tensor, &_bufinfo, MP_BUFFER_WRITE)) {
+
+    switch(_bufinfo.typecode) {
+      
+      case BYTEARRAY_TYPECODE:
+      case 'B':
+          memcpy((uint8_t *)_bufinfo.buf,_output.data.uint8,_bufinfo.len);
+          break;
+
+      case 'b':
+          memcpy((int8_t *)_bufinfo.buf,_output.data.int8,_bufinfo.len);
+          break;
+
+      case 'f':
+          memcpy((float *)_bufinfo.buf,_output.data.f,_bufinfo.len);
+          break;
+
+      default:
+          return mp_const_false;
+
+    }
+
+    return mp_const_true;
+
+  }    
+
+
+  return mp_const_false;
 }
 
 STATIC mp_obj_t microai_value_input_quantize(mp_obj_t value) {
@@ -159,40 +203,41 @@ STATIC mp_obj_t microai_value_output_dequantize(mp_obj_t value_quantized) {
   
 }
 
-STATIC mp_obj_t microai_value_byte_to_int(mp_obj_t byte_value) {
+STATIC mp_obj_t microai_get_image(mp_uint_t n_args, const mp_obj_t *args) {
 
-  int8_t _byte_value;
-  
-  _byte_value = mp_obj_get_int(byte_value);
-  
-  return mp_obj_new_int((int32_t)_byte_value);
-}
+  int              _image_width;
+  int              _image_height;
+  int              _image_channels;
+  mp_buffer_info_t _bufinfo;
 
+  (void)n_args;
 
-#define IMAGE_WIDTH     96
-#define IMAGE_HEIGHT    96
-#define IMAGE_CHANNEL   1
+  _image_width    = mp_obj_get_int(args[0]);
+  _image_height   = mp_obj_get_int(args[1]);
+  _image_channels = mp_obj_get_int(args[2]);
 
-static int8_t m_image_buffer[IMAGE_WIDTH*IMAGE_HEIGHT*IMAGE_CHANNEL];
+  if (mp_get_buffer(args[3], &_bufinfo, MP_BUFFER_WRITE)) {
 
-STATIC mp_obj_t microai_get_image() {
+    if( (_bufinfo.typecode == 'b') && ((_image_width * _image_height * _image_channels) == _bufinfo.len) ) {
 
-  if(microai_person_detection_example_GetImage(IMAGE_WIDTH,IMAGE_HEIGHT,IMAGE_CHANNEL, m_image_buffer) != RSLT_SUCCESS) {
-    return mp_const_none;
+      if(microai_person_detection_example_GetImage(_image_width, _image_height, _image_channels,(int8_t*)_bufinfo.buf) == RSLT_SUCCESS) {
+         return mp_const_true;
+      }
+
+    }
+
   }
 
-  return mp_obj_new_bytearray(sizeof(m_image_buffer)/sizeof(int8_t), m_image_buffer);
-
+  return mp_const_false;
 } 
 
 STATIC const MP_DEFINE_CONST_FUN_OBJ_0(microai_obj_load_hello_world_model,microai_load_hello_world_model);
 STATIC const MP_DEFINE_CONST_FUN_OBJ_0(microai_obj_load_person_detection_model,microai_load_person_detection_model);
-STATIC const MP_DEFINE_CONST_FUN_OBJ_1(microai_obj_set_input_tensor_int8,microai_set_input_tensor_int8);
-STATIC const MP_DEFINE_CONST_FUN_OBJ_1(microai_obj_get_output_tensor_int8,microai_get_output_tensor_int8);
+STATIC const MP_DEFINE_CONST_FUN_OBJ_1(microai_obj_set_input_tensor_value,microai_set_input_tensor_value);
+STATIC const MP_DEFINE_CONST_FUN_OBJ_1(microai_obj_get_output_tensor_value,microai_get_output_tensor_value);
 STATIC const MP_DEFINE_CONST_FUN_OBJ_1(microai_obj_value_input_quantize,microai_value_input_quantize);
 STATIC const MP_DEFINE_CONST_FUN_OBJ_1(microai_obj_value_output_dequantize,microai_value_output_dequantize);
-STATIC const MP_DEFINE_CONST_FUN_OBJ_0(microai_obj_get_image,microai_get_image);
-STATIC const MP_DEFINE_CONST_FUN_OBJ_1(microai_obj_value_byte_to_int,microai_value_byte_to_int);
+STATIC const MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(microai_obj_get_image,4,4,microai_get_image);
 
 /***** Module *****/
 
@@ -220,12 +265,11 @@ STATIC const mp_rom_map_elem_t microai_globals_table[] = {
   {MP_OBJ_NEW_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_microai)},
   {MP_OBJ_NEW_QSTR(MP_QSTR_load_hello_world_model), MP_ROM_PTR(&microai_obj_load_hello_world_model)},
   {MP_OBJ_NEW_QSTR(MP_QSTR_load_person_detection_model), MP_ROM_PTR(&microai_obj_load_person_detection_model)},
-  {MP_OBJ_NEW_QSTR(MP_QSTR_set_input_tensor_int8), MP_ROM_PTR(&microai_obj_set_input_tensor_int8)},
-  {MP_OBJ_NEW_QSTR(MP_QSTR_get_output_tensor_int8), MP_ROM_PTR(&microai_obj_get_output_tensor_int8)},
+  {MP_OBJ_NEW_QSTR(MP_QSTR_set_input_tensor_value), MP_ROM_PTR(&microai_obj_set_input_tensor_value)},
+  {MP_OBJ_NEW_QSTR(MP_QSTR_get_output_tensor_value), MP_ROM_PTR(&microai_obj_get_output_tensor_value)},
   {MP_OBJ_NEW_QSTR(MP_QSTR_value_input_quantize), MP_ROM_PTR(&microai_obj_value_input_quantize)},
   {MP_OBJ_NEW_QSTR(MP_QSTR_value_output_dequantize), MP_ROM_PTR(&microai_obj_value_output_dequantize)},
   {MP_OBJ_NEW_QSTR(MP_QSTR_get_image), MP_ROM_PTR(&microai_obj_get_image)},
-  {MP_OBJ_NEW_QSTR(MP_QSTR_value_byte_to_int), MP_ROM_PTR(&microai_obj_value_byte_to_int)},
 };
 
 STATIC MP_DEFINE_CONST_DICT(mp_module_microai_globals, microai_globals_table);   
