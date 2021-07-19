@@ -15,10 +15,10 @@
 typedef enum{RSLT_SUCCESS, RSLT_FAIL} microai_result;
 
 typedef union MicroaiPtrUnion {
-  	float*   f;
-    uint8_t* uint8;
-    int8_t*  int8;
-	void*    data;
+  float*   f;
+  uint8_t* uint8;
+  int8_t*  int8;
+  void*    data;
 } microai_ptr_union;
 
 typedef struct MicroaiTensor {
