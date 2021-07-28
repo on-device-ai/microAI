@@ -120,6 +120,9 @@ static microai_result capture_start() {
   
 }
 
+#define GRAY_CHANNELS 1
+#define RGB_CHANNELS  3
+
 microai_result microai_person_detection_example_GetImage(int image_width,int image_height, int channels, int8_t* image_data) {
 
   int             r;
@@ -133,8 +136,6 @@ microai_result microai_person_detection_example_GetImage(int image_width,int ima
 
   cv::Mat         picNV12;
   cv::Mat         picBGR;
-  cv::Mat         picGray;
-  cv::Mat         picGrayResize;
 
   uint8_t         *byte_array; 
   uint32_t        byte_array_len;
@@ -175,13 +176,40 @@ microai_result microai_person_detection_example_GetImage(int image_width,int ima
 
   cv::cvtColor(picNV12, picBGR, CV_YUV2BGR_NV12);
 
-  cv::cvtColor(picBGR, picGray, CV_BGR2GRAY);
+  if( channels == GRAY_CHANNELS ) {
 
-  cv::resize( picGray, picGrayResize, cv::Size(image_width, image_height));
+    cv::Mat picGray;
+    cv::Mat picGray_resize;
 
-  byte_array = picGrayResize.isContinuous() ? picGrayResize.data : picGrayResize.clone().data;
+    cv::cvtColor(picBGR, picGray, CV_BGR2GRAY);
 
-  byte_array_len = picGrayResize.total() * picGrayResize.channels();
+    cv::resize( picGray, picGray_resize, cv::Size(image_width, image_height));
+
+    byte_array = picGray_resize.isContinuous() ? picGray_resize.data : picGray_resize.clone().data;
+
+    byte_array_len = picGray_resize.total() * picGray_resize.channels();
+
+  } else if( channels == RGB_CHANNELS ) {
+
+    cv::Mat picRGB;
+    cv::Mat picRGB_resize;
+
+    cv::cvtColor(picBGR, picRGB, CV_BGR2RGB);
+
+    cv::resize( picRGB, picRGB_resize, cv::Size(image_width, image_height));
+
+    byte_array = picRGB_resize.isContinuous() ? picRGB_resize.data : picRGB_resize.clone().data;
+
+    byte_array_len = picRGB_resize.total() * picRGB_resize.channels();
+
+    
+  } else {
+
+    xioctl(m_fd, VIDIOC_QBUF, &m_buf);
+    
+    return RSLT_FAIL;
+
+  }
 
   for(int i=0;i<byte_array_len;i++) {
     image_data[i] = (int8_t)(byte_array[i] - 128);
@@ -190,7 +218,6 @@ microai_result microai_person_detection_example_GetImage(int image_width,int ima
   xioctl(m_fd, VIDIOC_QBUF, &m_buf);
 
   return RSLT_SUCCESS;
-
 }
 
 void microai_capture_stop() {
@@ -216,6 +243,7 @@ void image_data_to_bmp(int image_width,int image_height, int channels, int8_t* i
 
   int       image_data_size = image_width * image_height * channels;
   uint8_t * byte_array = (uint8_t *) malloc( image_data_size );
+  cv::Mat   picImage;
 
   if( byte_array ) {
 
@@ -223,7 +251,18 @@ void image_data_to_bmp(int image_width,int image_height, int channels, int8_t* i
       byte_array[i] = (uint8_t)(image_data[i] + 128);
     }
 
-    cv::Mat picImage = cv::Mat(image_height , image_width, CV_8UC1, byte_array);
+    if( channels == GRAY_CHANNELS ) {
+
+      picImage = cv::Mat(image_height , image_width, CV_8UC1, byte_array);
+
+    } else if( channels == RGB_CHANNELS ) {
+
+      cv::Mat picRGB = cv::Mat(image_height , image_width, CV_8UC3, byte_array);
+
+      // Bear in mind that OpenCV represents color values in the BGR order.
+      cv::cvtColor(picRGB, picImage, CV_RGB2BGR);
+
+    }
 
     cv::imwrite(bmp_file_name, picImage);    
 
