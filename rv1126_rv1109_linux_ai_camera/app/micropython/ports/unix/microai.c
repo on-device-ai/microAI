@@ -1,10 +1,10 @@
 /******************************************************
-	project	: MicroPython microAI module
-	module	: mp_module_microai
-	author	: Yi-Lin Tung
-	version	:
-	date 	:
-	Copyright (c) On-Device AI Co., Ltd.
+  project	: MicroPython microAI module
+  module	: mp_module_microai
+  author	: Yi-Lin Tung
+  version	:
+  date 	:
+  Copyright (c) On-Device AI Co., Ltd.
 ******************************************************/
 
 #include <stdio.h>
