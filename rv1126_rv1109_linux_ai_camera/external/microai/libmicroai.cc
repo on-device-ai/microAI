@@ -1,10 +1,10 @@
 /******************************************************
-	project	: microAI Library
-	module	: The tflite-micro library's wrapper functions
-	author	: Yi-Lin Tung
-	version	:
-	date 	:
-	Copyright (c) On-Device AI Co., Ltd.
+  project	: microAI Library
+  module	: The tflite-micro library's wrapper functions
+  author	: Yi-Lin Tung
+  version	:
+  date 	:
+  Copyright (c) On-Device AI Co., Ltd.
 ******************************************************/
 
 #include "libmicroai.h"
@@ -102,17 +102,17 @@ microai_result tflite_interpreterInvoke() {
 
 void microai_get_input_tensor(microai_tensor *input_tensor) {
 
-	input_tensor->data.data        = input->data.data;
-	input_tensor->param_scale      = input->params.scale;
-	input_tensor->param_zero_point = input->params.zero_point;
+  input_tensor->data.data        = input->data.data;
+  input_tensor->param_scale      = input->params.scale;
+  input_tensor->param_zero_point = input->params.zero_point;
 	
 }
 
 void microai_get_output_tensor(microai_tensor *output_tensor) {
 	
-	output_tensor->data.data        = output->data.data;
-	output_tensor->param_scale      = output->params.scale;
-	output_tensor->param_zero_point = output->params.zero_point;
+  output_tensor->data.data        = output->data.data;
+  output_tensor->param_scale      = output->params.scale;
+  output_tensor->param_zero_point = output->params.zero_point;
 	
 }
 
