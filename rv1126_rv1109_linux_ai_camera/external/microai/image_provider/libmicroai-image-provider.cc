@@ -258,8 +258,7 @@ void image_data_to_bmp(int image_width,int image_height, int channels, int8_t* i
     } else if( channels == RGB_CHANNELS ) {
 
       cv::Mat picRGB = cv::Mat(image_height , image_width, CV_8UC3, byte_array);
-
-      // Bear in mind that OpenCV represents color values in the BGR order.
+      
       cv::cvtColor(picRGB, picImage, CV_RGB2BGR);
 
     }
