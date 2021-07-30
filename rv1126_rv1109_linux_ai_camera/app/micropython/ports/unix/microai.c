@@ -10,6 +10,11 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 #include "libmicroai.h"
 
 #include "hello_world_model.h"
@@ -86,12 +91,55 @@ STATIC mp_obj_t microai_load_hello_world_model() {
   
 }
 
-
 STATIC mp_obj_t microai_load_person_detection_model() {
 
   microai_result _result;
 
   _result = tflite_GetModel(person_detection_model);
+
+  return _result == RSLT_SUCCESS ? mp_const_true : mp_const_false ;
+  
+}
+
+#define MAX_MODEL_SIZE (64*1024*1024)
+static uint8_t model_buffer[MAX_MODEL_SIZE];
+
+STATIC mp_obj_t microai_load_model_from_file(mp_obj_t filename) {
+
+  microai_result _result;
+
+  const char *_filename = mp_obj_str_get_str(filename);
+
+  int _fd;
+
+  struct stat _sb;
+
+  _fd = open( _filename, O_RDONLY);
+  if( _fd == -1 ) {
+
+    return mp_const_false;
+
+  }
+
+  if( stat( _filename, &_sb) == -1 ) {
+
+    return mp_const_false;
+
+  }
+
+  if( _sb.st_size > MAX_MODEL_SIZE ) {
+
+    return mp_const_false;
+
+  }
+
+  memset( model_buffer, 0x00, sizeof(model_buffer));
+
+  read( _fd, model_buffer, _sb.st_size);
+
+  close(_fd);
+
+  _result = tflite_GetModel( (const unsigned char *)model_buffer );
 
   return _result == RSLT_SUCCESS ? mp_const_true : mp_const_false ;
   
@@ -233,6 +281,7 @@ STATIC mp_obj_t microai_get_image(mp_uint_t n_args, const mp_obj_t *args) {
 
 STATIC const MP_DEFINE_CONST_FUN_OBJ_0(microai_obj_load_hello_world_model,microai_load_hello_world_model);
 STATIC const MP_DEFINE_CONST_FUN_OBJ_0(microai_obj_load_person_detection_model,microai_load_person_detection_model);
+STATIC const MP_DEFINE_CONST_FUN_OBJ_1(microai_obj_load_model_from_file,microai_load_model_from_file);
 STATIC const MP_DEFINE_CONST_FUN_OBJ_1(microai_obj_set_input_tensor_value,microai_set_input_tensor_value);
 STATIC const MP_DEFINE_CONST_FUN_OBJ_1(microai_obj_get_output_tensor_value,microai_get_output_tensor_value);
 STATIC const MP_DEFINE_CONST_FUN_OBJ_1(microai_obj_value_input_quantize,microai_value_input_quantize);
@@ -265,6 +314,7 @@ STATIC const mp_rom_map_elem_t microai_globals_table[] = {
   {MP_OBJ_NEW_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_microai)},
   {MP_OBJ_NEW_QSTR(MP_QSTR_load_hello_world_model), MP_ROM_PTR(&microai_obj_load_hello_world_model)},
   {MP_OBJ_NEW_QSTR(MP_QSTR_load_person_detection_model), MP_ROM_PTR(&microai_obj_load_person_detection_model)},
+  {MP_OBJ_NEW_QSTR(MP_QSTR_load_model_from_file), MP_ROM_PTR(&microai_obj_load_model_from_file)},
   {MP_OBJ_NEW_QSTR(MP_QSTR_set_input_tensor_value), MP_ROM_PTR(&microai_obj_set_input_tensor_value)},
   {MP_OBJ_NEW_QSTR(MP_QSTR_get_output_tensor_value), MP_ROM_PTR(&microai_obj_get_output_tensor_value)},
   {MP_OBJ_NEW_QSTR(MP_QSTR_value_input_quantize), MP_ROM_PTR(&microai_obj_value_input_quantize)},
