@@ -14,7 +14,7 @@ tflite.build_interpreter()
 if tflite.allocate_tensors() is False :
   sys.exit()
 
-input_tensor  = array.array('b', [0])
+input_tensor  = array.array('b',[0])
 output_tensor = array.array('b',[0])
   
 inference_count = 0;
